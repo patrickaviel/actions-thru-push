@@ -15,14 +15,14 @@ class GitCommand {
             For assignment #1:
             Create logic here and run unit testing.
         */
-        // let count = Object.keys(this.working_directory.new_changes).length;
-        // if(count){
-        //     let files = [];
-        //     for(const [key,value] of Object.entries(this.working_directory.new_changes)){
-        //         files.push(key);
-        //     }
-        //     return `You have ${count} change/s.\n`+files.join('\n');
-        // }
+        let count = Object.keys(this.working_directory.new_changes).length;
+        if(count){
+            let files = [];
+            for(const [key,value] of Object.entries(this.working_directory.new_changes)){
+                files.push(key);
+            }
+            return `You have ${count} change/s.\n`+files.join('\n');
+        }
         
        return "You have 0 change/s.\n";
     }
@@ -34,12 +34,19 @@ class GitCommand {
         if(modified_files[path_file]){
             this.staging.push(modified_files[path_file]);
             delete modified_files[path_file];
+        }else if(path_file == "*"){
+            let file_list = Object.keys(modified_files);
+
+            for(let row=0;row<file_list.length;row++){
+                if(!file_list[row].startsWith(".")){
+                    this.staging.push(modified_files[file_list[row]]);
+                    delete this.working_directory.new_changes[file_list[row]];
+                }
+            }
+        }else if(path_file == "."){
+            this.staging.push(modified_files);
+            this.working_directory.new_changes = {};
         }
-        /*
-            For assignment #2:
-            Create logic here and run unit testing.
-            Don't forget to uncomment the unit tests.
-        */
         else{
             return `Failed to add ${path_file}! File is not modified or missing.`;
         }
